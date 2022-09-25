@@ -14,8 +14,7 @@ class MainActivity : ComponentActivity(), LifecycleOwner {
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
         lifecycle.addObserver(mainViewModel)
         setContent {
-            TopBar()
-            VideoCard(mainViewModel)
+            VideoScreen(mainViewModel)
         }
     }
 }

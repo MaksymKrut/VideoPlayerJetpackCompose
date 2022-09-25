@@ -8,22 +8,36 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.*
+import org.json.JSONObject
 
 @Composable
-fun TopBar() {
-    TopAppBar(title = { Text(text = "Video Player") })
-}
-
-@Composable
-fun VideoCard(mainViewModel: MainViewModel) {
+fun VideoScreen(mainViewModel: MainViewModel) {
     var videoList by remember { mainViewModel.videoList }
     var currentVideoIndex by remember { mainViewModel.currentVideoIndex }
+    var videoListLoaded = videoList.length() > 0
+    var currentVideoObject =
+        if (videoListLoaded) videoList.getJSONObject(currentVideoIndex) else null
+
+    TopAppBar(title = { Text(text = "Video Player") })
 
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "List length: ${videoList.length()}")
+        if (videoListLoaded && currentVideoObject != null) {
+            VideoPlayer(currentVideoObject)
+            VideoDescription(currentVideoObject)
+        }
     }
+}
+
+@Composable
+fun VideoPlayer(currentVideoObject: JSONObject) {
+    Text(text = "Current video title: ${currentVideoObject["hlsURL"]}")
+}
+
+@Composable
+fun VideoDescription(currentVideoObject: JSONObject) {
+    Text(text = "Current video title: ${currentVideoObject["title"]}")
 }
