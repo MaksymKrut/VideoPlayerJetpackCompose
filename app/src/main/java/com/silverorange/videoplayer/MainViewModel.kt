@@ -6,24 +6,34 @@ import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleObserver
+import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.fuel.json.responseJson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
 class MainViewModel(app: Application) : AndroidViewModel(app), LifecycleObserver {
     private val TAG = "MainViewModel"
+
     @SuppressLint("StaticFieldLeak")
     val appContext: Context = getApplication<Application>().applicationContext
-    var videoList = mutableStateOf(listOf(ArrayList<String>()))
+
+    @SuppressLint("MutableCollectionMutableState")
+    var videoList = mutableStateOf("")
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
-//            videoList = try {
-//                // getVideoList()
-//            } catch (exception: Exception) {
-//                // show error toast
-//            }
+            getVideoList()
         }
     }
 
+    private fun getVideoList() {
+        val url = "http://192.168.10.125:4000/videos"
+        url.httpGet().responseJson() { _, _, result ->
+            val response = result.get()
+            videoList.value = response.content
+            println("Response videoList.value:${videoList.value}")
+        }
+    }
 }

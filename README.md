@@ -18,3 +18,9 @@ Steps:
    as rendered Markdown.
 9. In the details section, also display the title and author of the current
    video.
+
+Problems solved:
+
+Accessing localhost:4000 server - 
+1. usesCleartextTraffic property in Manifest file
+2. use local IP for host machine

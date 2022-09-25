@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity(), LifecycleOwner {
         lifecycle.addObserver(mainViewModel)
         setContent {
             TopBar()
-            TextCard(mainViewModel)
+            VideoCard(mainViewModel)
         }
     }
 }

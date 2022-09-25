@@ -15,7 +15,7 @@ fun TopBar() {
 }
 
 @Composable
-fun TextCard(mainViewModel: MainViewModel) {
+fun VideoCard(mainViewModel: MainViewModel) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
