@@ -11,6 +11,7 @@ import com.github.kittinunf.fuel.json.responseJson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 
 
 class MainViewModel(app: Application) : AndroidViewModel(app), LifecycleObserver {
@@ -20,7 +21,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app), LifecycleObserver
     val appContext: Context = getApplication<Application>().applicationContext
 
     @SuppressLint("MutableCollectionMutableState")
-    var videoList = mutableStateOf("")
+    var videoList = mutableStateOf(JSONArray("[]"))
+    var currentVideoIndex = mutableStateOf(0)
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -28,11 +30,19 @@ class MainViewModel(app: Application) : AndroidViewModel(app), LifecycleObserver
         }
     }
 
+    fun nextVideo() {
+        currentVideoIndex.value++
+    }
+
+    fun previousVideo() {
+        currentVideoIndex.value--
+    }
+
     private fun getVideoList() {
         val url = "http://192.168.10.125:4000/videos"
         url.httpGet().responseJson() { _, _, result ->
             val response = result.get()
-            videoList.value = response.content
+            videoList.value = response.array()
             println("Response videoList.value:${videoList.value}")
         }
     }
