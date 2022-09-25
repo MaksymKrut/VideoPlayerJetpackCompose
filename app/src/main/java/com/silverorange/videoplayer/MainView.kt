@@ -3,6 +3,7 @@ package com.silverorange.videoplayer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.ui.Alignment
@@ -18,23 +19,31 @@ fun VideoScreen(mainViewModel: MainViewModel) {
     var currentVideoObject =
         if (videoListLoaded) videoList.getJSONObject(currentVideoIndex) else null
 
-    TopAppBar(title = { Text(text = "Video Player") })
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        if (videoListLoaded && currentVideoObject != null) {
-            VideoPlayer(currentVideoObject)
-            VideoDescription(currentVideoObject)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Video Player") }
+            )
+        },
+        content = {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (videoListLoaded && currentVideoObject != null) {
+                    VideoPlayer(currentVideoObject)
+                    VideoDescription(currentVideoObject)
+                }
+            }
         }
-    }
+    )
 }
 
 @Composable
 fun VideoPlayer(currentVideoObject: JSONObject) {
-    Text(text = "Current video title: ${currentVideoObject["hlsURL"]}")
+    var currentAuthorObject = currentVideoObject.getJSONObject("author")
+    Text(text = "Current video name: ${currentAuthorObject["name"]}")
 }
 
 @Composable

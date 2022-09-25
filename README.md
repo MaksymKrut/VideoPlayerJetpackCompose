@@ -1,3 +1,5 @@
+Using the server on localhost:4000 - make sure you insert your PC internal IP in viewModel file.
+
 Steps:
 
 1. Display a screen similar to the provided wireframe. The screen should
