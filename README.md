@@ -1,4 +1,6 @@
-Using the server on localhost:4000 - make sure you insert your PC internal IP in viewModel file.
+Using the server on localhost:4000
+Real device - make sure you insert your PC internal IP in viewModel file
+Emulator - set 10.0.2.2 proxy in its settings
 
 Steps:
 
