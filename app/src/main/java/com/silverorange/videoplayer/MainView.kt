@@ -3,7 +3,6 @@ package com.silverorange.videoplayer
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -11,9 +10,10 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -93,6 +93,7 @@ fun VideoPlayer(mainViewModel: MainViewModel) {
 fun VideoDescription(mainViewModel: MainViewModel) {
     var videoList by remember { mainViewModel.videoList }
     var currentVideoIndex by remember { mainViewModel.currentVideoIndex }
+    InfoRow(videoList.getJSONObject(currentVideoIndex))
     MarkdownText(
         markdown = videoList.getJSONObject(currentVideoIndex)["description"].toString(),
         fontSize = 20.sp,
@@ -102,36 +103,19 @@ fun VideoDescription(mainViewModel: MainViewModel) {
 }
 
 @Composable
-fun ControlRow() {
-    Row(
-        Modifier
-            .padding(40.dp, 0.dp)
-            .fillMaxWidth()
-    ) {
-        Image(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_previous),
-            contentDescription = "Previous",
-            modifier = Modifier
-                .padding(0.dp, 20.dp)
-                .size(30.dp)
-        )
-        Spacer(Modifier.weight(1f))
-        Image(
-            imageVector = ImageVector.vectorResource(id = if (true) R.drawable.ic_play else R.drawable.ic_pause),
-            contentDescription = "Play or Pause",
-            modifier = Modifier
-                .padding(0.dp, 20.dp)
-                .size(30.dp)
-        )
-        Spacer(Modifier.weight(1f))
-        Image(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_play_next),
-            contentDescription = "Next",
-            modifier = Modifier
-                .padding(0.dp, 20.dp)
-                .size(30.dp)
-        )
-    }
+fun InfoRow(currentObject: JSONObject) {
+    val author = currentObject.getJSONObject("author")["name"]
+
+    Text(
+        text = "Title: " + currentObject["title"] as String,
+        style = TextStyle(textDecoration = TextDecoration.Underline),
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp
+    )
+    Text(
+        text = "Author: " + author as String,
+        fontSize = 20.sp
+    )
 }
 
 private fun eventsListener(mainViewModel: MainViewModel) = object : Player.Listener {

@@ -15,8 +15,6 @@ import org.json.JSONArray
 
 
 class MainViewModel(app: Application) : AndroidViewModel(app), LifecycleObserver {
-    private val TAG = "MainViewModel"
-
     @SuppressLint("StaticFieldLeak")
     val appContext: Context = getApplication<Application>().applicationContext
 
@@ -28,14 +26,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app), LifecycleObserver
         CoroutineScope(Dispatchers.IO).launch {
             getVideoList()
         }
-    }
-
-    fun nextVideo() {
-        currentVideoIndex.value++
-    }
-
-    fun previousVideo() {
-        currentVideoIndex.value--
     }
 
     private fun getVideoList() {

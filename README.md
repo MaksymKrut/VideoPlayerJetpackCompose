@@ -21,7 +21,7 @@ Steps:
 8. In the details section, show the returned description for the current video
    as rendered Markdown. - DONE
 9. In the details section, also display the title and author of the current
-   video. - TODO
+   video. - DONE
 
 Problems solved:
 
