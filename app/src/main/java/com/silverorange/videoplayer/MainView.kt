@@ -1,14 +1,15 @@
 package com.silverorange.videoplayer
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
@@ -17,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import org.json.JSONObject
@@ -42,8 +44,7 @@ fun VideoScreen(mainViewModel: MainViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if (videoListLoaded && currentVideoObject != null) {
-                    VideoPlayer(currentVideoObject)
-                    VideoDescription(currentVideoObject)
+                    VideoPlayer(mainViewModel)
                 }
             }
         }
@@ -51,32 +52,60 @@ fun VideoScreen(mainViewModel: MainViewModel) {
 }
 
 @Composable
-fun VideoPlayer(currentVideoObject: JSONObject) {
+fun VideoPlayer(mainViewModel: MainViewModel) {
     val localContext = LocalContext.current
+    val playbackStateListener: Player.Listener = playbackStateListener()
+
+    //TODO Create and add playbackStackListener to update description according to playing video
+    var description = ""
+
+    var videoList by remember { mainViewModel.videoList }
     val mExoPlayer = remember(localContext) {
         ExoPlayer.Builder(localContext).build().apply {
-            val mediaItem = MediaItem.Builder()
-                .setUri(Uri.parse(currentVideoObject["hlsURL"] as String))
-                .build()
-            setMediaItem(mediaItem)
-            playWhenReady = true
+            for (i in 0 until videoList.length()) {
+                var videoObject = videoList.getJSONObject(i)
+                description = videoObject["description"] as String
+                val mediaItem = MediaItem.Builder()
+                    .setUri(Uri.parse(videoObject["hlsURL"] as String))
+                    .build()
+                addMediaItem(mediaItem)
+            }
+            playWhenReady = false
             prepare()
         }
     }
+    mExoPlayer.addListener(playbackStateListener)
     AndroidView(factory = { context ->
         StyledPlayerView(context).apply {
             player = mExoPlayer
         }
     })
+    VideoDescription(description)
 }
 
 @Composable
-fun VideoDescription(currentVideoObject: JSONObject) {
-    ControlRow()
+fun VideoDescription(description: String) {
+    // ControlRow()
     MarkdownText(
-        markdown = currentVideoObject["description"].toString(),
-        fontSize = 20.sp
+        markdown = description,
+        fontSize = 20.sp,
+        modifier = Modifier
+            .padding(20.dp, 0.dp),
     )
+}
+
+private fun playbackStateListener() = object : Player.Listener {
+    val TAG = "playbackStateListener"
+    override fun onPlaybackStateChanged(playbackState: Int) {
+        val stateString: String = when (playbackState) {
+            ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE      -"
+            ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING -"
+            ExoPlayer.STATE_READY -> "ExoPlayer.STATE_READY     -"
+            ExoPlayer.STATE_ENDED -> "ExoPlayer.STATE_ENDED     -"
+            else -> "UNKNOWN_STATE             -"
+        }
+        Log.d(TAG, "changed state to $stateString")
+    }
 }
 
 @Composable
