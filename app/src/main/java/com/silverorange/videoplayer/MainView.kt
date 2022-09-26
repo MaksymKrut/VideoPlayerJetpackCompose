@@ -21,7 +21,6 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import dev.jeziellago.compose.markdowntext.MarkdownText
-import org.json.JSONObject
 
 @Composable
 fun VideoScreen(mainViewModel: MainViewModel) {
@@ -54,17 +53,14 @@ fun VideoScreen(mainViewModel: MainViewModel) {
 @Composable
 fun VideoPlayer(mainViewModel: MainViewModel) {
     val localContext = LocalContext.current
-    val playbackStateListener: Player.Listener = playbackStateListener()
-
-    //TODO Create and add playbackStackListener to update description according to playing video
-    var description = ""
+    val eventsListener: Player.Listener = eventsListener(mainViewModel)
 
     var videoList by remember { mainViewModel.videoList }
+
     val mExoPlayer = remember(localContext) {
         ExoPlayer.Builder(localContext).build().apply {
             for (i in 0 until videoList.length()) {
-                var videoObject = videoList.getJSONObject(i)
-                description = videoObject["description"] as String
+                val videoObject = videoList.getJSONObject(i)
                 val mediaItem = MediaItem.Builder()
                     .setUri(Uri.parse(videoObject["hlsURL"] as String))
                     .build()
@@ -74,37 +70,31 @@ fun VideoPlayer(mainViewModel: MainViewModel) {
             prepare()
         }
     }
-    mExoPlayer.addListener(playbackStateListener)
+    mExoPlayer.addListener(eventsListener)
     AndroidView(factory = { context ->
         StyledPlayerView(context).apply {
             player = mExoPlayer
         }
     })
-    VideoDescription(description)
+    VideoDescription(mainViewModel)
 }
 
 @Composable
-fun VideoDescription(description: String) {
-    // ControlRow()
+fun VideoDescription(mainViewModel: MainViewModel) {
+    var videoList by remember { mainViewModel.videoList }
+    var currentVideoIndex by remember { mainViewModel.currentVideoIndex }
     MarkdownText(
-        markdown = description,
+        markdown = videoList.getJSONObject(currentVideoIndex)["description"].toString(),
         fontSize = 20.sp,
         modifier = Modifier
             .padding(20.dp, 0.dp),
     )
 }
 
-private fun playbackStateListener() = object : Player.Listener {
-    val TAG = "playbackStateListener"
-    override fun onPlaybackStateChanged(playbackState: Int) {
-        val stateString: String = when (playbackState) {
-            ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE      -"
-            ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING -"
-            ExoPlayer.STATE_READY -> "ExoPlayer.STATE_READY     -"
-            ExoPlayer.STATE_ENDED -> "ExoPlayer.STATE_ENDED     -"
-            else -> "UNKNOWN_STATE             -"
-        }
-        Log.d(TAG, "changed state to $stateString")
+private fun eventsListener(mainViewModel: MainViewModel) = object : Player.Listener {
+    override fun onEvents(player: Player, events: Player.Events) {
+        mainViewModel.currentVideoIndex.value = player.getCurrentWindowIndex()
+        Log.d("eventsListener", "${player.getCurrentWindowIndex()}")
     }
 }
 
