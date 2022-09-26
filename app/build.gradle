@@ -53,6 +53,10 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1'
     implementation 'androidx.compose.runtime:runtime-livedata:1.1.1'
     implementation 'androidx.compose.runtime:runtime-rxjava2:1.1.1'
+    implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
+    implementation 'com.github.kittinunf.fuel:fuel:2.3.1'
+    implementation 'com.github.kittinunf.fuel:fuel-json:2.3.1'
+    implementation 'com.github.jeziellago:compose-markdown:0.3.0'
 
     testImplementation 'junit:junit:4.13.2'
 
