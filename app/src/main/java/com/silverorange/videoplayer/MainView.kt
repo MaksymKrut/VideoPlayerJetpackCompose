@@ -1,5 +1,6 @@
 package com.silverorange.videoplayer
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -21,6 +22,12 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import dev.jeziellago.compose.markdowntext.MarkdownText
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 @Composable
 fun VideoScreen(mainViewModel: MainViewModel) {
@@ -56,6 +63,7 @@ fun VideoPlayer(mainViewModel: MainViewModel) {
     val eventsListener: Player.Listener = eventsListener(mainViewModel)
 
     var videoList by remember { mainViewModel.videoList }
+    videoList = sortVideoList(videoList)
 
     val mExoPlayer = remember(localContext) {
         ExoPlayer.Builder(localContext).build().apply {
@@ -73,6 +81,8 @@ fun VideoPlayer(mainViewModel: MainViewModel) {
     mExoPlayer.addListener(eventsListener)
     AndroidView(factory = { context ->
         StyledPlayerView(context).apply {
+            setShowRewindButton(false)
+            setShowFastForwardButton(false)
             player = mExoPlayer
         }
     })
@@ -89,13 +99,6 @@ fun VideoDescription(mainViewModel: MainViewModel) {
         modifier = Modifier
             .padding(20.dp, 0.dp),
     )
-}
-
-private fun eventsListener(mainViewModel: MainViewModel) = object : Player.Listener {
-    override fun onEvents(player: Player, events: Player.Events) {
-        mainViewModel.currentVideoIndex.value = player.getCurrentWindowIndex()
-        Log.d("eventsListener", "${player.getCurrentWindowIndex()}")
-    }
 }
 
 @Composable
@@ -130,3 +133,36 @@ fun ControlRow() {
         )
     }
 }
+
+private fun eventsListener(mainViewModel: MainViewModel) = object : Player.Listener {
+    override fun onEvents(player: Player, events: Player.Events) {
+        mainViewModel.currentVideoIndex.value = player.getCurrentWindowIndex()
+        Log.d("eventsListener", "${player.getCurrentWindowIndex()}")
+    }
+}
+
+@SuppressLint("SimpleDateFormat")
+private fun sortVideoList(videoListArray: JSONArray): JSONArray {
+    val sortedVideoListArrayArray = JSONArray()
+    val videoList: MutableList<JSONObject> = ArrayList()
+    for (i in 0 until videoListArray.length()) {
+        videoList.add(videoListArray.getJSONObject(i))
+    }
+    videoList.sortWith { p0, p1 ->
+        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        var valA = Date()
+        var valB = Date()
+        try {
+            valA = format.parse(p0.get("publishedAt") as String) as Date
+            valB = format.parse(p1.get("publishedAt") as String) as Date
+        } catch (e: JSONException) {
+            throw Exception(e)
+        }
+        valA.compareTo(valB)
+    }
+    for (i in 0 until videoList.size) {
+        sortedVideoListArrayArray.put(videoList[i])
+    }
+    return sortedVideoListArrayArray
+}
+
