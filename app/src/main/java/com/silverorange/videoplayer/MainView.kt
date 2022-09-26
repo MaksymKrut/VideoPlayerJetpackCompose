@@ -1,16 +1,18 @@
 package com.silverorange.videoplayer
 
 import android.net.Uri
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.exoplayer2.ExoPlayer
@@ -70,11 +72,42 @@ fun VideoPlayer(currentVideoObject: JSONObject) {
 
 @Composable
 fun VideoDescription(currentVideoObject: JSONObject) {
-    Text(text = "Title: ${currentVideoObject["title"]}\n")
-    var currentAuthorObject = currentVideoObject.getJSONObject("author")
-    Text(text = "Author: ${currentAuthorObject["name"]}\n")
+    ControlRow()
     MarkdownText(
         markdown = currentVideoObject["description"].toString(),
         fontSize = 20.sp
     )
+}
+
+@Composable
+fun ControlRow() {
+    Row(
+        Modifier
+            .padding(40.dp, 0.dp)
+            .fillMaxWidth()
+    ) {
+        Image(
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_previous),
+            contentDescription = "Previous",
+            modifier = Modifier
+                .padding(0.dp, 20.dp)
+                .size(30.dp)
+        )
+        Spacer(Modifier.weight(1f))
+        Image(
+            imageVector = ImageVector.vectorResource(id = if (true) R.drawable.ic_play else R.drawable.ic_pause),
+            contentDescription = "Play or Pause",
+            modifier = Modifier
+                .padding(0.dp, 20.dp)
+                .size(30.dp)
+        )
+        Spacer(Modifier.weight(1f))
+        Image(
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_play_next),
+            contentDescription = "Next",
+            modifier = Modifier
+                .padding(0.dp, 20.dp)
+                .size(30.dp)
+        )
+    }
 }
